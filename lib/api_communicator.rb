@@ -1,12 +1,21 @@
 require 'rest-client'
 require 'json'
 require 'pry'
-
+require 'pp'
 def get_character_movies_from_api(character_name)
   #make the web request
   response_string = RestClient.get('http://www.swapi.co/api/people/')
   response_hash = JSON.parse(response_string)
-
+  films = []    
+  response_hash["results"].each do |char|
+    if char["name"].downcase == character_name
+      char["films"].each do |film|
+        r_string = RestClient.get(film)
+        films << JSON.parse(r_string)
+        end
+      end
+  end
+  films
   # iterate over the response hash to find the collection of `films` for the given
   #   `character`
   # collect those film API urls, make a web request to each URL to get the info
@@ -19,6 +28,9 @@ def get_character_movies_from_api(character_name)
 end
 
 def print_movies(films)
+  films.each do |film|
+    puts film["title"]
+  end
   # some iteration magic and puts out the movies in a nice list
 end
 
